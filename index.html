@@ -745,6 +745,120 @@
       min-height: 64px;
     }
 
+    /* Separate Custom Days Section */
+    .custom-days-section {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background: var(--bg-color);
+      padding: 14px;
+      border-radius: 16px;
+      border: 1px solid var(--border-color);
+      margin-top: 2px;
+    }
+
+    .custom-days-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .custom-days-header-label {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-main);
+      letter-spacing: 0.3px;
+    }
+
+    .custom-days-toggle-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 6px 14px;
+      border-radius: 10px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .custom-days-toggle-btn.active {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+      box-shadow: 0 2px 6px rgba(45, 96, 255, 0.25);
+    }
+
+    .custom-days-picker {
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      padding-top: 4px;
+    }
+
+    .custom-days-picker.visible {
+      display: flex;
+    }
+
+    .custom-days-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 6px;
+    }
+
+    .preset-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 4px 8px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--primary);
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .preset-btn:hover {
+      background: var(--item-hover);
+    }
+
+    .day-chips-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .day-chip {
+      flex: 1;
+      height: 42px;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      background: var(--card-bg);
+      color: var(--text-main);
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+
+    .day-chip:hover {
+      background: var(--item-hover);
+    }
+
+    .day-chip.active {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+      box-shadow: 0 2px 6px rgba(45, 96, 255, 0.3);
+    }
+
     .toggle-row {
       display: flex;
       align-items: center;
@@ -939,7 +1053,6 @@
   <!-- Main View -->
   <div class="app-container">
     <div class="top-nav">
-      <!-- Standard Header Nav -->
       <div class="standard-nav" id="standardNav">
         <button class="icon-btn" id="openDrawerBtn" aria-label="Open navigation menu">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -956,7 +1069,6 @@
         </button>
       </div>
 
-      <!-- Multi-Select Action Nav -->
       <div class="selection-nav" id="selectionNav">
         <button class="icon-btn" id="cancelSelectionBtn" aria-label="Cancel selection">✕</button>
         <span class="selection-counter" id="selectionCount">0 selected</span>
@@ -1052,6 +1164,33 @@
         </div>
       </div>
 
+      <!-- Separate Custom Days Section with dedicated Header and Button -->
+      <div class="custom-days-section">
+        <div class="custom-days-header-row">
+          <!--span class="custom-days-header-label">Custom Days</span !-->
+          <button type="button" class="custom-days-toggle-btn" id="customDaysToggleBtn">
+            <span>Custom days</span>
+          </button>
+        </div>
+
+        <div class="custom-days-picker" id="customDaysPicker">
+          <div class="custom-days-actions">
+            <button type="button" class="preset-btn" id="presetWeekdaysBtn">Weekdays</button>
+            <button type="button" class="preset-btn" id="presetWeekendsBtn">Weekends</button>
+            <button type="button" class="preset-btn" id="presetAllDaysBtn">All</button>
+          </div>
+          <div class="day-chips-row" id="dayChipsRow">
+            <button type="button" class="day-chip" data-day="1">Mon</button>
+            <button type="button" class="day-chip" data-day="2">Tue</button>
+            <button type="button" class="day-chip" data-day="3">Wed</button>
+            <button type="button" class="day-chip" data-day="4">Thu</button>
+            <button type="button" class="day-chip" data-day="5">Fri</button>
+            <button type="button" class="day-chip" data-day="6">Sat</button>
+            <button type="button" class="day-chip" data-day="0">Sun</button>
+          </div>
+        </div>
+      </div>
+
       <div class="modal-actions">
         <button type="button" class="btn btn-secondary" id="closeModalBtn">Cancel</button>
         <button type="button" class="btn btn-primary" id="saveReminderBtn">Save</button>
@@ -1124,8 +1263,9 @@
 
     let reminders = JSON.parse(localStorage.getItem(STORAGE_KEY_ACTIVE)) || [];
     let trash = JSON.parse(localStorage.getItem(STORAGE_KEY_TRASH)) || [];
-    let settings = JSON.parse(localStorage.getItem(STORAGE_KEY_SETTINGS)) || { 
-      currentView: 'Reminders', 
+
+    const defaultSettings = {
+      currentView: 'Reminders',
       currentFilter: 'all',
       darkMode: false,
       autoCollapseCompleted: false,
@@ -1135,13 +1275,35 @@
       }
     };
 
-    if (!settings.collapsedSections) {
-      settings.collapsedSections = { active: false, completed: false };
+    let parsedSettings = {};
+    try {
+      parsedSettings = JSON.parse(localStorage.getItem(STORAGE_KEY_SETTINGS)) || {};
+    } catch (e) {
+      parsedSettings = {};
+    }
+
+    let settings = {
+      ...defaultSettings,
+      ...parsedSettings,
+      collapsedSections: {
+        ...defaultSettings.collapsedSections,
+        ...(parsedSettings.collapsedSections || {})
+      }
+    };
+
+    if (settings.darkMode) {
+      document.body.classList.add('dark-mode');
+    } else {
+      document.body.classList.remove('dark-mode');
     }
 
     let isSelectionMode = false;
     let selectedTaskIds = new Set();
     let currentEditingTaskId = null;
+
+    // Independent custom days state
+    let isCustomDaysActive = false;
+    let selectedCustomDays = [1, 2, 3, 4, 5]; // 1=Mon .. 0=Sun
 
     const reminderList = document.getElementById('reminderList');
     const modalOverlay = document.getElementById('modalOverlay');
@@ -1162,6 +1324,14 @@
     const drawer = document.getElementById('drawer');
     const openDrawerBtn = document.getElementById('openDrawerBtn');
     const emptyTrashBtn = document.getElementById('emptyTrashBtn');
+
+    // Separate Custom Days elements
+    const customDaysToggleBtn = document.getElementById('customDaysToggleBtn');
+    const customDaysPicker = document.getElementById('customDaysPicker');
+    const dayChipsRow = document.getElementById('dayChipsRow');
+    const presetWeekdaysBtn = document.getElementById('presetWeekdaysBtn');
+    const presetWeekendsBtn = document.getElementById('presetWeekendsBtn');
+    const presetAllDaysBtn = document.getElementById('presetAllDaysBtn');
 
     const openSettingsBtn = document.getElementById('openSettingsBtn');
     const settingsModalOverlay = document.getElementById('settingsModalOverlay');
@@ -1193,10 +1363,7 @@
         day: 'numeric'
       });
 
-      if (settings.darkMode) {
-        document.body.classList.add('dark-mode');
-        darkThemeToggle.checked = true;
-      }
+      darkThemeToggle.checked = Boolean(settings.darkMode);
       autoCollapseToggle.checked = Boolean(settings.autoCollapseCompleted);
 
       if (settings.currentView === 'Recycle bin') {
@@ -1221,7 +1388,6 @@
       }
     }
 
-    // Full Date & Time format for reminders display
     function formatDisplayDate(dateStr) {
       if (!dateStr) return '';
       const d = new Date(dateStr);
@@ -1245,28 +1411,50 @@
       return `${year}-${month}-${day}T${hours}:${minutes}`;
     }
 
-    // Precise incremental calculations per repeat option
-    function calculateNextRepeatDate(baseDateStr, recurrence) {
+    function getCustomDaysLabel(daysArray) {
+      if (!daysArray || daysArray.length === 0) return 'Custom days';
+      if (daysArray.length === 7) return 'Everyday';
+      const names = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      const sorted = [...daysArray].sort((a, b) => {
+        const orderA = a === 0 ? 7 : a;
+        const orderB = b === 0 ? 7 : b;
+        return orderA - orderB;
+      });
+      return sorted.map(d => names[d]).join(', ');
+    }
+
+    // Incremental calculations per recurrence pattern
+    function calculateNextRepeatDate(baseDateStr, isCustom, customDays, standardRecurrence) {
       const base = baseDateStr ? new Date(baseDateStr) : new Date();
       const nextDate = new Date(base);
 
-      switch (recurrence) {
+      if (isCustom) {
+        const days = (customDays && customDays.length > 0) ? customDays : [1, 2, 3, 4, 5];
+        let found = false;
+        for (let i = 1; i <= 7; i++) {
+          nextDate.setDate(nextDate.getDate() + 1);
+          if (days.includes(nextDate.getDay())) {
+            found = true;
+            break;
+          }
+        }
+        if (!found) nextDate.setDate(nextDate.getDate() + 1);
+        return formatLocalDatetime(nextDate);
+      }
+
+      switch (standardRecurrence) {
         case 'Every minute':
           nextDate.setMinutes(nextDate.getMinutes() + 1);
           break;
-
         case 'Every hour':
           nextDate.setHours(nextDate.getHours() + 1);
           break;
-
         case 'Everyday':
           nextDate.setDate(nextDate.getDate() + 1);
           break;
-
         case 'Every week':
           nextDate.setDate(nextDate.getDate() + 7);
           break;
-
         case 'Every month': {
           const currentDay = nextDate.getDate();
           nextDate.setDate(1);
@@ -1275,7 +1463,6 @@
           nextDate.setDate(Math.min(currentDay, daysInNextMonth));
           break;
         }
-
         case 'Every year': {
           const currentDay = nextDate.getDate();
           const currentMonth = nextDate.getMonth();
@@ -1288,7 +1475,6 @@
           }
           break;
         }
-
         default:
           return null;
       }
@@ -1379,9 +1565,16 @@
       card.className = `reminder-card ${item.completed ? 'completed' : ''} ${isSelected ? 'selected' : ''}`;
       card.dataset.id = item.id;
 
+      let repeatLabel = '';
+      if (item.isCustomDays) {
+        repeatLabel = getCustomDaysLabel(item.customDays);
+      } else if (item.repeat && item.repeat !== "Don't repeat") {
+        repeatLabel = item.repeat;
+      }
+
       let metaHtml = '';
       if (item.due) metaHtml += `<span class="meta-badge highlight">${formatDisplayDate(item.due)}</span>`;
-      if (item.repeat && item.repeat !== "Don't repeat") metaHtml += `<span class="meta-badge">🔁 ${escapeHtml(item.repeat)}</span>`;
+      if (repeatLabel) metaHtml += `<span class="meta-badge">🔁 ${escapeHtml(repeatLabel)}</span>`;
       if (item.alarmVolume) metaHtml += `<span class="meta-badge">🔔 ${escapeHtml(item.alarmVolume)}</span>`;
 
       card.innerHTML = `
@@ -1489,7 +1682,6 @@
       });
     }
 
-    /* Selection Mode Management */
     function enterSelectionMode(initialId = null) {
       isSelectionMode = true;
       selectedTaskIds.clear();
@@ -1533,22 +1725,19 @@
       bulkEditBtn.disabled = count !== 1;
     }
 
-    /* Task Completion & Reoccurrence Increment Handler */
     function toggleReminder(id) {
       const target = reminders.find(r => r.id === id);
       if (!target) return;
 
       const isMarkingComplete = !target.completed;
-      const hasRecurrence = target.repeat && target.repeat !== "Don't repeat";
+      const hasRecurrence = target.isCustomDays || (target.repeat && target.repeat !== "Don't repeat");
 
       if (isMarkingComplete) {
-        // Move current cycle into completed list
         target.completed = true;
         target.completedAt = new Date().toISOString();
 
-        // If recurring, calculate next date cycle and spawn into active list
         if (hasRecurrence) {
-          const nextDue = calculateNextRepeatDate(target.due, target.repeat);
+          const nextDue = calculateNextRepeatDate(target.due, target.isCustomDays, target.customDays, target.repeat);
           if (nextDue) {
             const nextCycleTask = {
               ...target,
@@ -1605,7 +1794,26 @@
       renderContent();
     }
 
-    /* Modal Form Setup */
+    function renderDayChipsSelection(daysArray) {
+      dayChipsRow.querySelectorAll('.day-chip').forEach(chip => {
+        const dayVal = parseInt(chip.dataset.day, 10);
+        chip.classList.toggle('active', daysArray.includes(dayVal));
+      });
+    }
+
+    function setCustomDaysActiveState(isActive) {
+      isCustomDaysActive = isActive;
+      customDaysToggleBtn.classList.toggle('active', isActive);
+      customDaysPicker.classList.toggle('visible', isActive);
+
+      if (isActive) {
+        repeatSelect.value = "Don't repeat";
+        repeatSelect.disabled = true;
+      } else {
+        repeatSelect.disabled = false;
+      }
+    }
+
     function openModalForCreate() {
       currentEditingTaskId = null;
       modalTitle.textContent = 'New Reminder';
@@ -1617,6 +1825,10 @@
       importantToggle.checked = false;
       repeatSelect.value = "Don't repeat";
       alarmSelect.value = 'Medium';
+
+      selectedCustomDays = [1, 2, 3, 4, 5];
+      renderDayChipsSelection(selectedCustomDays);
+      setCustomDaysActiveState(false);
 
       modalOverlay.classList.add('active');
       titleInput.focus();
@@ -1636,6 +1848,10 @@
       importantToggle.checked = Boolean(item.important);
       repeatSelect.value = item.repeat || "Don't repeat";
       alarmSelect.value = item.alarmVolume || 'Medium';
+
+      selectedCustomDays = (item.customDays && item.customDays.length > 0) ? [...item.customDays] : [1, 2, 3, 4, 5];
+      renderDayChipsSelection(selectedCustomDays);
+      setCustomDaysActiveState(Boolean(item.isCustomDays));
 
       modalOverlay.classList.add('active');
       titleInput.focus();
@@ -1676,6 +1892,8 @@
 
       openSettingsBtn.addEventListener('click', () => {
         drawerOverlay.classList.remove('active');
+        darkThemeToggle.checked = Boolean(settings.darkMode);
+        autoCollapseToggle.checked = Boolean(settings.autoCollapseCompleted);
         settingsModalOverlay.classList.add('active');
       });
 
@@ -1689,14 +1907,14 @@
         }
       });
 
-      darkThemeToggle.addEventListener('change', () => {
-        settings.darkMode = darkThemeToggle.checked;
+      darkThemeToggle.addEventListener('change', (e) => {
+        settings.darkMode = Boolean(e.target.checked);
         document.body.classList.toggle('dark-mode', settings.darkMode);
         persistAllData();
       });
 
-      autoCollapseToggle.addEventListener('change', () => {
-        settings.autoCollapseCompleted = autoCollapseToggle.checked;
+      autoCollapseToggle.addEventListener('change', (e) => {
+        settings.autoCollapseCompleted = Boolean(e.target.checked);
         persistAllData();
         renderContent();
       });
@@ -1755,6 +1973,44 @@
           exitSelectionMode();
           openModalForEdit(selectedId);
         }
+      });
+
+      // Toggle separate Custom Days button
+      customDaysToggleBtn.addEventListener('click', () => {
+        setCustomDaysActiveState(!isCustomDaysActive);
+      });
+
+      // Individual Day Chips Click (Mon=1, Tue=2, Wed=3, Thu=4, Fri=5, Sat=6, Sun=0)
+      dayChipsRow.addEventListener('click', (e) => {
+        const chip = e.target.closest('.day-chip');
+        if (!chip) return;
+
+        const dayVal = parseInt(chip.dataset.day, 10);
+        if (selectedCustomDays.includes(dayVal)) {
+          if (selectedCustomDays.length > 1) {
+            selectedCustomDays = selectedCustomDays.filter(d => d !== dayVal);
+            chip.classList.remove('active');
+          }
+        } else {
+          selectedCustomDays.push(dayVal);
+          chip.classList.add('active');
+        }
+      });
+
+      // Presets
+      presetWeekdaysBtn.addEventListener('click', () => {
+        selectedCustomDays = [1, 2, 3, 4, 5];
+        renderDayChipsSelection(selectedCustomDays);
+      });
+
+      presetWeekendsBtn.addEventListener('click', () => {
+        selectedCustomDays = [6, 0];
+        renderDayChipsSelection(selectedCustomDays);
+      });
+
+      presetAllDaysBtn.addEventListener('click', () => {
+        selectedCustomDays = [1, 2, 3, 4, 5, 6, 0];
+        renderDayChipsSelection(selectedCustomDays);
       });
 
       reminderList.addEventListener('click', (e) => {
@@ -1817,6 +2073,10 @@
         const title = titleInput.value.trim();
         if (!title) return;
 
+        const isCustom = Boolean(isCustomDaysActive);
+        const customDaysVal = isCustom ? [...selectedCustomDays] : null;
+        const repeatVal = isCustom ? "Don't repeat" : repeatSelect.value;
+
         if (currentEditingTaskId) {
           const target = reminders.find(r => r.id === currentEditingTaskId);
           if (target) {
@@ -1824,7 +2084,9 @@
             target.memo = memoInput.value.trim() || null;
             target.important = importantToggle.checked;
             target.due = dueInput.value || null;
-            target.repeat = repeatSelect.value;
+            target.repeat = repeatVal;
+            target.isCustomDays = isCustom;
+            target.customDays = customDaysVal;
             target.alarmVolume = alarmSelect.value;
           }
         } else {
@@ -1834,7 +2096,9 @@
             memo: memoInput.value.trim() || null,
             important: importantToggle.checked,
             due: dueInput.value || null,
-            repeat: repeatSelect.value,
+            repeat: repeatVal,
+            isCustomDays: isCustom,
+            customDays: customDaysVal,
             alarmVolume: alarmSelect.value,
             completed: false,
             createdAt: new Date().toISOString()
