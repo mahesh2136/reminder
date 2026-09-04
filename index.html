@@ -1,0 +1,1854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>One UI Reminders</title>
+  <style>
+    :root {
+      --bg-color: #f2f4f8;
+      --card-bg: #ffffff;
+      --primary: #2d60ff;
+      --primary-tint: #eaf0ff;
+      --text-main: #191c21;
+      --text-sub: #787e8c;
+      --border-color: #e4e7ec;
+      --divider-color: #e5e7eb;
+      --danger: #ff4d4f;
+      --star-color: #ffb300;
+      --item-hover: #f1f3f7;
+      --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body.dark-mode {
+      --bg-color: #121417;
+      --card-bg: #1c1f24;
+      --text-main: #f0f2f5;
+      --text-sub: #9aa0a6;
+      --border-color: #2e333d;
+      --divider-color: #272b33;
+      --item-hover: #262a32;
+      --primary-tint: #1c274c;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: var(--font-family);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+      transition: background-color 0.2s, color 0.2s;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 480px;
+      background: var(--bg-color);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Top Navigation Bar */
+    .top-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px 8px;
+      min-height: 56px;
+    }
+
+    .selection-nav {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+    }
+
+    .selection-nav.active {
+      display: flex;
+    }
+
+    .standard-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+    }
+
+    .standard-nav.hidden {
+      display: none;
+    }
+
+    .icon-btn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px;
+      border-radius: 50%;
+      color: var(--text-main);
+      transition: background 0.2s;
+    }
+
+    .icon-btn:hover {
+      background: var(--item-hover);
+    }
+
+    .selection-counter {
+      font-weight: 700;
+      font-size: 1.05rem;
+    }
+
+    .select-all-btn {
+      background: transparent;
+      border: none;
+      color: var(--primary);
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      padding: 6px 10px;
+      border-radius: 8px;
+    }
+
+    .select-all-btn:hover {
+      background: var(--primary-tint);
+    }
+
+    /* Header */
+    header {
+      padding: 8px 24px 16px;
+    }
+
+    .header-subtitle {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .header-title {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-top: 4px;
+    }
+
+    /* Reminder List Section */
+    .reminder-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0 20px 80px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .empty-state {
+      text-align: center;
+      margin-top: 60px;
+      color: var(--text-sub);
+      font-size: 0.95rem;
+    }
+
+    /* Status Sections & Collapsible Containers */
+    .section-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 4px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .section-header-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-sub);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-count-badge {
+      background: var(--border-color);
+      color: var(--text-main);
+      font-size: 0.75rem;
+      padding: 2px 7px;
+      border-radius: 10px;
+      font-weight: 600;
+    }
+
+    .section-toggle-icon {
+      font-size: 0.75rem;
+      color: var(--text-sub);
+      transition: transform 0.25s ease;
+    }
+
+    .section-group.collapsed .section-toggle-icon {
+      transform: rotate(-90deg);
+    }
+
+    .cards-container {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      overflow: hidden;
+      transition: max-height 0.28s ease, opacity 0.2s ease;
+      max-height: 2000px;
+      opacity: 1;
+    }
+
+    .section-group.collapsed .cards-container {
+      max-height: 0;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* Reminder Card */
+    .reminder-card {
+      background: var(--card-bg);
+      border-radius: 18px;
+      padding: 16px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+      transition: transform 0.15s ease, opacity 0.2s ease, border-color 0.2s;
+      cursor: pointer;
+      user-select: none;
+      position: relative;
+      border: 2px solid transparent;
+    }
+
+    .reminder-card.selected {
+      border-color: var(--primary);
+      background: var(--primary-tint);
+    }
+
+    .reminder-main {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .checkbox {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 2px solid #b8bec9;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+      transition: all 0.2s ease;
+    }
+
+    .checkbox.checked {
+      background: var(--primary);
+      border-color: var(--primary);
+    }
+
+    .checkbox.checked::after {
+      content: "✓";
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .select-checkbox {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      border: 2px solid #b8bec9;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .selection-mode .checkbox {
+      display: none;
+    }
+
+    .selection-mode .select-checkbox {
+      display: flex;
+    }
+
+    .reminder-card.selected .select-checkbox {
+      background: var(--primary);
+      border-color: var(--primary);
+    }
+
+    .reminder-card.selected .select-checkbox::after {
+      content: "✓";
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .reminder-details {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      overflow: hidden;
+      flex: 1;
+    }
+
+    .reminder-title-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .reminder-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-main);
+      word-break: break-word;
+    }
+
+    .important-star {
+      color: var(--star-color);
+      font-size: 0.95rem;
+    }
+
+    .reminder-card.completed .reminder-title,
+    .reminder-card.completed .reminder-memo {
+      text-decoration: line-through;
+      color: var(--text-sub);
+    }
+
+    .reminder-memo {
+      font-size: 0.85rem;
+      color: var(--text-sub);
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .reminder-meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.75rem;
+      color: var(--text-sub);
+      margin-top: 2px;
+    }
+
+    .meta-badge {
+      background: var(--item-hover);
+      padding: 4px 9px;
+      border-radius: 6px;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      line-height: 1.3;
+    }
+
+    .meta-badge.highlight {
+      background: var(--primary-tint);
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    .card-actions {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .selection-mode .card-actions {
+      display: none;
+    }
+
+    .action-btn {
+      background: transparent;
+      border: none;
+      color: #b8bec9;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.2s;
+    }
+
+    .action-btn:hover {
+      color: var(--danger);
+    }
+
+    .action-btn.restore:hover {
+      color: var(--primary);
+    }
+
+    /* Creator Tag Footer */
+    .app-footer {
+      padding: 10px 24px;
+      text-align: center;
+      background: transparent;
+      border-top: 1px solid var(--divider-color);
+      z-index: 5;
+    }
+
+    .creator-tag {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-sub);
+      letter-spacing: 0.5px;
+      user-select: none;
+    }
+
+    .creator-tag span {
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    /* Selection Bottom Action Bar */
+    .selection-bottom-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--card-bg);
+      border-top: 1px solid var(--border-color);
+      box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.06);
+      display: none;
+      align-items: center;
+      justify-content: space-around;
+      padding: 12px 16px 20px;
+      z-index: 20;
+    }
+
+    .selection-bottom-bar.active {
+      display: flex;
+    }
+
+    .bottom-action-btn {
+      background: transparent;
+      border: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-main);
+      cursor: pointer;
+      padding: 6px 12px;
+      border-radius: 10px;
+      transition: background 0.15s, opacity 0.2s;
+    }
+
+    .bottom-action-btn:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+
+    .bottom-action-btn.danger {
+      color: var(--danger);
+    }
+
+    .bottom-action-btn svg {
+      width: 20px;
+      height: 20px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* Floating Action Button */
+    .fab {
+      position: absolute;
+      bottom: 50px;
+      right: 24px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      font-size: 1.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(45, 96, 255, 0.4);
+      cursor: pointer;
+      transition: transform 0.2s ease;
+      z-index: 10;
+    }
+
+    .fab:active {
+      transform: scale(0.95);
+    }
+
+    /* Drawer Styles */
+    .drawer-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.35);
+      z-index: 200;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .drawer-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .drawer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 82%;
+      max-width: 340px;
+      height: 100%;
+      background: var(--card-bg);
+      z-index: 201;
+      transform: translateX(-100%);
+      transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+      box-shadow: 4px 0 16px rgba(0, 0, 0, 0.08);
+    }
+
+    .drawer-overlay.active .drawer {
+      transform: translateX(0);
+    }
+
+    .drawer-header {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 16px 20px 8px;
+    }
+
+    .drawer-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 16px 16px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .drawer-divider {
+      height: 1px;
+      background-color: var(--divider-color);
+      margin: 10px 4px;
+    }
+
+    .drawer-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      border-radius: 12px;
+      cursor: pointer;
+      color: var(--text-main);
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: background 0.15s, opacity 0.2s;
+    }
+
+    .drawer-item:hover {
+      background: var(--item-hover);
+    }
+
+    .drawer-item.active {
+      background: var(--item-hover);
+      font-weight: 700;
+    }
+
+    .drawer-item-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .drawer-item-left svg {
+      width: 22px;
+      height: 22px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      color: var(--text-main);
+    }
+
+    .drawer-badge {
+      background: var(--border-color);
+      color: var(--text-main);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 10px;
+      min-width: 22px;
+      text-align: center;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .drawer-item.active .drawer-badge {
+      background: var(--primary);
+      color: #ffffff;
+    }
+
+    .drawer-footer {
+      padding: 16px 20px 24px;
+      background: var(--card-bg);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .manage-btn {
+      width: 100%;
+      background: var(--item-hover);
+      border: none;
+      border-radius: 20px;
+      padding: 12px 16px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-main);
+      cursor: pointer;
+      transition: background 0.2s, opacity 0.2s;
+    }
+
+    .manage-btn:hover:not(:disabled) {
+      background: var(--border-color);
+    }
+
+    .manage-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    /* Modals & Popups */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      z-index: 300;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-sheet {
+      background: var(--card-bg);
+      color: var(--text-main);
+      width: 100%;
+      max-width: 480px;
+      max-height: 90vh;
+      border-radius: 24px 24px 0 0;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      overflow-y: auto;
+      animation: slideUp 0.25s ease-out;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+
+    .modal-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-header {
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+
+    .modal-delete-btn {
+      background: transparent;
+      border: none;
+      color: var(--danger);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 8px;
+      display: none;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .input-group label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-sub);
+    }
+
+    .input-field {
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 0.95rem;
+      outline: none;
+      background: var(--bg-color);
+      color: var(--text-main);
+    }
+
+    .input-field:focus {
+      border-color: var(--primary);
+    }
+
+    textarea.input-field {
+      resize: vertical;
+      min-height: 64px;
+    }
+
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px 0;
+    }
+
+    .toggle-label {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .toggle-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    .toggle-sub {
+      font-size: 0.75rem;
+      color: var(--text-sub);
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background-color: #ccc;
+      border-radius: 24px;
+      transition: 0.3s;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      border-radius: 50%;
+      transition: 0.3s;
+    }
+
+    input:checked + .slider {
+      background-color: var(--primary);
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(20px);
+    }
+
+    .grid-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 14px;
+      border-radius: 14px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn-secondary {
+      background: var(--item-hover);
+      color: var(--text-main);
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #ffffff;
+    }
+
+    /* Settings Options List */
+    .settings-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .settings-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      background: var(--bg-color);
+      border-radius: 14px;
+      cursor: pointer;
+    }
+
+    .settings-row-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .settings-row-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    .settings-row-desc {
+      font-size: 0.75rem;
+      color: var(--text-sub);
+    }
+
+    .settings-row-action {
+      display: flex;
+      align-items: center;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation Drawer (Side Bar) -->
+  <div class="drawer-overlay" id="drawerOverlay">
+    <aside class="drawer" id="drawer">
+      <div class="drawer-header">
+        <button class="icon-btn" id="openSettingsBtn" aria-label="Settings">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </button>
+      </div>
+
+      <div class="drawer-content">
+        <div class="drawer-item active" data-view="Reminders" data-filter="all">
+          <div class="drawer-item-left">
+            <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+            <span>All</span>
+          </div>
+          <span class="drawer-badge" id="badgeAll">0</span>
+        </div>
+
+        <div class="drawer-item" data-filter="completed">
+          <div class="drawer-item-left">
+            <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            <span>Completed</span>
+          </div>
+          <span class="drawer-badge" id="badgeCompleted">0</span>
+        </div>
+
+        <div class="drawer-divider"></div>
+
+        <div class="drawer-item" data-view="Recycle bin">
+          <div class="drawer-item-left">
+            <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            <span>Recycle bin</span>
+          </div>
+          <span class="drawer-badge" id="badgeTrash">0</span>
+        </div>
+
+        <div class="drawer-item" data-view="Sync now">
+          <div class="drawer-item-left">
+            <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+            <span>Sync now</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="drawer-footer">
+        <button class="manage-btn" id="emptyTrashBtn">Empty Recycle Bin</button>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Main View -->
+  <div class="app-container">
+    <div class="top-nav">
+      <!-- Standard Header Nav -->
+      <div class="standard-nav" id="standardNav">
+        <button class="icon-btn" id="openDrawerBtn" aria-label="Open navigation menu">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+        <button class="icon-btn" id="startSelectionBtn" aria-label="Select reminders">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 11 12 14 22 4"></polyline>
+            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Multi-Select Action Nav -->
+      <div class="selection-nav" id="selectionNav">
+        <button class="icon-btn" id="cancelSelectionBtn" aria-label="Cancel selection">✕</button>
+        <span class="selection-counter" id="selectionCount">0 selected</span>
+        <button class="select-all-btn" id="selectAllBtn">Select all</button>
+      </div>
+    </div>
+
+    <header>
+      <div class="header-subtitle" id="dateDisplay">Today</div>
+      <h1 class="header-title" id="pageTitle">All</h1>
+    </header>
+
+    <div class="reminder-list" id="reminderList"></div>
+
+    <button class="fab" id="openModalBtn" aria-label="Add reminder">+</button>
+
+    <!-- Bottom Selection Action Bar -->
+    <div class="selection-bottom-bar" id="selectionBottomBar">
+      <button class="bottom-action-btn" id="bulkEditBtn" disabled>
+        <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+        <span>Edit</span>
+      </button>
+      <button class="bottom-action-btn danger" id="bulkDeleteBtn" disabled>
+        <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+        <span>Delete</span>
+      </button>
+    </div>
+
+    <!-- Creator Tag Footer -->
+    <footer class="app-footer">
+      <div class="creator-tag">Created by <span>Mahesh Arkalla</span></div>
+    </footer>
+  </div>
+
+  <!-- Create / Edit Modal Sheet -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal-sheet">
+      <div class="modal-header-row">
+        <div class="modal-header" id="modalTitle">New Reminder</div>
+        <button type="button" class="modal-delete-btn" id="modalDeleteBtn">Delete</button>
+      </div>
+
+      <div class="input-group">
+        <label for="reminderTitle">Title</label>
+        <input type="text" id="reminderTitle" class="input-field" placeholder="What do you need to do?" maxlength="80">
+      </div>
+
+      <div class="input-group">
+        <label for="reminderMemo">Memo</label>
+        <textarea id="reminderMemo" class="input-field" placeholder="Add additional details or notes..."></textarea>
+      </div>
+
+      <div class="input-group">
+        <div class="toggle-row">
+          <div class="toggle-label">
+            <span class="toggle-title">Important</span>
+            <span class="toggle-sub">Mark with star badge</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="importantToggle">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label for="reminderDue">Time</label>
+        <input type="datetime-local" id="reminderDue" class="input-field">
+      </div>
+
+      <div class="grid-options">
+        <div class="input-group">
+          <label for="reminderRepeat">Repeat</label>
+          <select id="reminderRepeat" class="input-field">
+            <option value="Don't repeat" selected>Don't repeat</option>
+            <option value="Every minute">Every minute</option>
+            <option value="Every hour">Every hour</option>
+            <option value="Everyday">Everyday</option>
+            <option value="Every week">Every week</option>
+            <option value="Every month">Every month</option>
+            <option value="Every year">Every year</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label for="reminderAlarm">Alarm Volume</label>
+          <select id="reminderAlarm" class="input-field">
+            <option value="Silent">Silent</option>
+            <option value="Low">Low</option>
+            <option value="Medium" selected>Medium</option>
+            <option value="High">High</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" id="closeModalBtn">Cancel</button>
+        <button type="button" class="btn btn-primary" id="saveReminderBtn">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Modal Sheet -->
+  <div class="modal-overlay" id="settingsModalOverlay">
+    <div class="modal-sheet">
+      <div class="modal-header-row">
+        <div class="modal-header">Reminder Settings</div>
+        <button type="button" class="icon-btn" id="closeSettingsBtn">✕</button>
+      </div>
+
+      <div class="settings-list">
+        <div class="settings-row">
+          <div class="settings-row-info">
+            <span class="settings-row-title">Dark theme</span>
+            <span class="settings-row-desc">Use dark color scheme for Samsung UI</span>
+          </div>
+          <div class="settings-row-action">
+            <label class="switch">
+              <input type="checkbox" id="darkThemeToggle">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="settings-row">
+          <div class="settings-row-info">
+            <span class="settings-row-title">Hide completed section</span>
+            <span class="settings-row-desc">Collapse completed tasks automatically</span>
+          </div>
+          <div class="settings-row-action">
+            <label class="switch">
+              <input type="checkbox" id="autoCollapseToggle">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="settings-row" id="exportDataRow">
+          <div class="settings-row-info">
+            <span class="settings-row-title">Backup data</span>
+            <span class="settings-row-desc">Save tasks JSON to internal device memory</span>
+          </div>
+          <div class="settings-row-action">
+            <span style="color: var(--primary); font-weight: 600; font-size: 0.9rem;">Export</span>
+          </div>
+        </div>
+
+        <div class="settings-row" id="clearAllRow">
+          <div class="settings-row-info">
+            <span class="settings-row-title" style="color: var(--danger);">Reset application data</span>
+            <span class="settings-row-desc">Delete all reminders and clear storage</span>
+          </div>
+          <div class="settings-row-action">
+            <span style="color: var(--danger); font-weight: 600; font-size: 0.9rem;">Clear</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY_ACTIVE = 'samsung_oneui_reminders_active';
+    const STORAGE_KEY_TRASH = 'samsung_oneui_reminders_trash';
+    const STORAGE_KEY_SETTINGS = 'samsung_oneui_reminders_settings';
+
+    let reminders = JSON.parse(localStorage.getItem(STORAGE_KEY_ACTIVE)) || [];
+    let trash = JSON.parse(localStorage.getItem(STORAGE_KEY_TRASH)) || [];
+    let settings = JSON.parse(localStorage.getItem(STORAGE_KEY_SETTINGS)) || { 
+      currentView: 'Reminders', 
+      currentFilter: 'all',
+      darkMode: false,
+      autoCollapseCompleted: false,
+      collapsedSections: {
+        active: false,
+        completed: false
+      }
+    };
+
+    if (!settings.collapsedSections) {
+      settings.collapsedSections = { active: false, completed: false };
+    }
+
+    let isSelectionMode = false;
+    let selectedTaskIds = new Set();
+    let currentEditingTaskId = null;
+
+    const reminderList = document.getElementById('reminderList');
+    const modalOverlay = document.getElementById('modalOverlay');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalDeleteBtn = document.getElementById('modalDeleteBtn');
+    const openModalBtn = document.getElementById('openModalBtn');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const saveReminderBtn = document.getElementById('saveReminderBtn');
+    const titleInput = document.getElementById('reminderTitle');
+    const memoInput = document.getElementById('reminderMemo');
+    const importantToggle = document.getElementById('importantToggle');
+    const dueInput = document.getElementById('reminderDue');
+    const repeatSelect = document.getElementById('reminderRepeat');
+    const alarmSelect = document.getElementById('reminderAlarm');
+    const dateDisplay = document.getElementById('dateDisplay');
+    const pageTitle = document.getElementById('pageTitle');
+    const drawerOverlay = document.getElementById('drawerOverlay');
+    const drawer = document.getElementById('drawer');
+    const openDrawerBtn = document.getElementById('openDrawerBtn');
+    const emptyTrashBtn = document.getElementById('emptyTrashBtn');
+
+    const openSettingsBtn = document.getElementById('openSettingsBtn');
+    const settingsModalOverlay = document.getElementById('settingsModalOverlay');
+    const closeSettingsBtn = document.getElementById('closeSettingsBtn');
+    const darkThemeToggle = document.getElementById('darkThemeToggle');
+    const autoCollapseToggle = document.getElementById('autoCollapseToggle');
+    const exportDataRow = document.getElementById('exportDataRow');
+    const clearAllRow = document.getElementById('clearAllRow');
+
+    const standardNav = document.getElementById('standardNav');
+    const selectionNav = document.getElementById('selectionNav');
+    const startSelectionBtn = document.getElementById('startSelectionBtn');
+    const cancelSelectionBtn = document.getElementById('cancelSelectionBtn');
+    const selectionCount = document.getElementById('selectionCount');
+    const selectAllBtn = document.getElementById('selectAllBtn');
+    const selectionBottomBar = document.getElementById('selectionBottomBar');
+    const bulkEditBtn = document.getElementById('bulkEditBtn');
+    const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
+
+    const badgeAll = document.getElementById('badgeAll');
+    const badgeCompleted = document.getElementById('badgeCompleted');
+    const badgeTrash = document.getElementById('badgeTrash');
+
+    function init() {
+      const now = new Date();
+      dateDisplay.textContent = now.toLocaleDateString(undefined, {
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric'
+      });
+
+      if (settings.darkMode) {
+        document.body.classList.add('dark-mode');
+        darkThemeToggle.checked = true;
+      }
+      autoCollapseToggle.checked = Boolean(settings.autoCollapseCompleted);
+
+      if (settings.currentView === 'Recycle bin') {
+        switchView('Recycle bin');
+      } else if (settings.currentFilter === 'completed') {
+        applyFilterView('completed');
+      } else {
+        switchView('Reminders');
+      }
+
+      updateSidebarCounts();
+      setupEventListeners();
+    }
+
+    function persistAllData() {
+      try {
+        localStorage.setItem(STORAGE_KEY_ACTIVE, JSON.stringify(reminders));
+        localStorage.setItem(STORAGE_KEY_TRASH, JSON.stringify(trash));
+        localStorage.setItem(STORAGE_KEY_SETTINGS, JSON.stringify(settings));
+      } catch (e) {
+        console.error('Storage quota exceeded:', e);
+      }
+    }
+
+    // Full Date & Time format for reminders display
+    function formatDisplayDate(dateStr) {
+      if (!dateStr) return '';
+      const d = new Date(dateStr);
+      return d.toLocaleDateString(undefined, { 
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long', 
+        day: 'numeric', 
+        hour: '2-digit', 
+        minute: '2-digit' 
+      });
+    }
+
+    function formatLocalDatetime(dateObj) {
+      const pad = (n) => String(n).padStart(2, '0');
+      const year = dateObj.getFullYear();
+      const month = pad(dateObj.getMonth() + 1);
+      const day = pad(dateObj.getDate());
+      const hours = pad(dateObj.getHours());
+      const minutes = pad(dateObj.getMinutes());
+      return `${year}-${month}-${day}T${hours}:${minutes}`;
+    }
+
+    // Precise incremental calculations per repeat option
+    function calculateNextRepeatDate(baseDateStr, recurrence) {
+      const base = baseDateStr ? new Date(baseDateStr) : new Date();
+      const nextDate = new Date(base);
+
+      switch (recurrence) {
+        case 'Every minute':
+          nextDate.setMinutes(nextDate.getMinutes() + 1);
+          break;
+
+        case 'Every hour':
+          nextDate.setHours(nextDate.getHours() + 1);
+          break;
+
+        case 'Everyday':
+          nextDate.setDate(nextDate.getDate() + 1);
+          break;
+
+        case 'Every week':
+          nextDate.setDate(nextDate.getDate() + 7);
+          break;
+
+        case 'Every month': {
+          const currentDay = nextDate.getDate();
+          nextDate.setDate(1);
+          nextDate.setMonth(nextDate.getMonth() + 1);
+          const daysInNextMonth = new Date(nextDate.getFullYear(), nextDate.getMonth() + 1, 0).getDate();
+          nextDate.setDate(Math.min(currentDay, daysInNextMonth));
+          break;
+        }
+
+        case 'Every year': {
+          const currentDay = nextDate.getDate();
+          const currentMonth = nextDate.getMonth();
+          nextDate.setFullYear(nextDate.getFullYear() + 1);
+          if (currentMonth === 1 && currentDay === 29) {
+            const isLeap = new Date(nextDate.getFullYear(), 1, 29).getMonth() === 1;
+            if (!isLeap) {
+              nextDate.setDate(28);
+            }
+          }
+          break;
+        }
+
+        default:
+          return null;
+      }
+
+      return formatLocalDatetime(nextDate);
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function updateSidebarCounts() {
+      const allCount = reminders.length;
+      const completedCount = reminders.filter(item => item.completed).length;
+      const trashCount = trash.length;
+
+      badgeAll.textContent = allCount;
+      badgeCompleted.textContent = completedCount;
+      badgeTrash.textContent = trashCount;
+
+      emptyTrashBtn.disabled = trashCount === 0;
+
+      const isRemindersView = settings.currentView === 'Reminders';
+      openModalBtn.style.display = isRemindersView ? 'flex' : 'none';
+      startSelectionBtn.style.display = isRemindersView ? 'flex' : 'none';
+    }
+
+    function updateActiveDrawerItem() {
+      drawer.querySelectorAll('.drawer-item').forEach(i => {
+        if (settings.currentView === 'Recycle bin') {
+          i.classList.toggle('active', i.dataset.view === 'Recycle bin');
+        } else if (settings.currentFilter === 'completed') {
+          i.classList.toggle('active', i.dataset.filter === 'completed');
+        } else {
+          i.classList.toggle('active', i.dataset.view === 'Reminders' && i.dataset.filter === 'all');
+        }
+      });
+    }
+
+    function switchView(viewName) {
+      exitSelectionMode();
+      settings.currentView = viewName;
+      settings.currentFilter = 'all';
+      pageTitle.textContent = viewName === 'Reminders' ? 'All' : viewName;
+
+      updateActiveDrawerItem();
+      updateSidebarCounts();
+
+      persistAllData();
+      renderContent();
+    }
+
+    function applyFilterView(filterName) {
+      exitSelectionMode();
+      settings.currentView = 'Reminders';
+      settings.currentFilter = filterName;
+
+      pageTitle.textContent = filterName === 'completed' ? 'Completed' : 'All';
+      updateActiveDrawerItem();
+      updateSidebarCounts();
+
+      persistAllData();
+      renderContent();
+    }
+
+    function renderContent() {
+      reminderList.innerHTML = '';
+      updateSidebarCounts();
+
+      if (settings.currentView === 'Recycle bin') {
+        renderTrashView();
+      } else if (settings.currentView === 'Reminders') {
+        renderRemindersView();
+      } else {
+        reminderList.innerHTML = `
+          <div class="empty-state">
+            No entries found for <strong>${escapeHtml(settings.currentView)}</strong> view.
+          </div>
+        `;
+      }
+    }
+
+    function buildReminderCard(item) {
+      const isSelected = selectedTaskIds.has(item.id);
+      const card = document.createElement('div');
+      card.className = `reminder-card ${item.completed ? 'completed' : ''} ${isSelected ? 'selected' : ''}`;
+      card.dataset.id = item.id;
+
+      let metaHtml = '';
+      if (item.due) metaHtml += `<span class="meta-badge highlight">${formatDisplayDate(item.due)}</span>`;
+      if (item.repeat && item.repeat !== "Don't repeat") metaHtml += `<span class="meta-badge">🔁 ${escapeHtml(item.repeat)}</span>`;
+      if (item.alarmVolume) metaHtml += `<span class="meta-badge">🔔 ${escapeHtml(item.alarmVolume)}</span>`;
+
+      card.innerHTML = `
+        <div class="reminder-main">
+          <div class="checkbox ${item.completed ? 'checked' : ''}" data-action="toggle"></div>
+          <div class="select-checkbox" data-action="select"></div>
+          <div class="reminder-details">
+            <div class="reminder-title-row">
+              <span class="reminder-title">${escapeHtml(item.title)}</span>
+              ${item.important ? '<span class="important-star">★</span>' : ''}
+            </div>
+            ${item.memo ? `<div class="reminder-memo">${escapeHtml(item.memo)}</div>` : ''}
+            ${metaHtml ? `<div class="reminder-meta">${metaHtml}</div>` : ''}
+          </div>
+        </div>
+        <div class="card-actions">
+          <button class="action-btn" data-action="trash" aria-label="Move to Recycle Bin">✕</button>
+        </div>
+      `;
+      return card;
+    }
+
+    function createSectionGroup(statusKey, title, items) {
+      const isCollapsed = settings.autoCollapseCompleted && statusKey === 'completed'
+        ? true 
+        : Boolean(settings.collapsedSections[statusKey]);
+
+      const group = document.createElement('div');
+      group.className = `section-group ${isCollapsed ? 'collapsed' : ''}`;
+      group.dataset.status = statusKey;
+
+      const header = document.createElement('div');
+      header.className = 'section-header';
+      header.innerHTML = `
+        <span class="section-header-title">
+          <span>${title}</span>
+          <span class="section-count-badge">${items.length}</span>
+        </span>
+        <span class="section-toggle-icon">▼</span>
+      `;
+
+      const cardsContainer = document.createElement('div');
+      cardsContainer.className = 'cards-container';
+      items.forEach(item => {
+        cardsContainer.appendChild(buildReminderCard(item));
+      });
+
+      group.appendChild(header);
+      group.appendChild(cardsContainer);
+      return group;
+    }
+
+    function renderRemindersView() {
+      if (reminders.length === 0) {
+        reminderList.innerHTML = `<div class="empty-state">No reminders in this list.</div>`;
+        return;
+      }
+
+      if (settings.currentFilter === 'completed') {
+        const completedOnly = reminders.filter(item => item.completed);
+        if (completedOnly.length === 0) {
+          reminderList.innerHTML = `<div class="empty-state">No completed reminders.</div>`;
+          return;
+        }
+        const group = createSectionGroup('completed', 'Completed', completedOnly);
+        reminderList.appendChild(group);
+        return;
+      }
+
+      const activeReminders = reminders.filter(item => !item.completed);
+      const completedReminders = reminders.filter(item => item.completed);
+
+      if (activeReminders.length > 0) {
+        reminderList.appendChild(createSectionGroup('active', 'To Do', activeReminders));
+      }
+
+      if (completedReminders.length > 0) {
+        reminderList.appendChild(createSectionGroup('completed', 'Completed', completedReminders));
+      }
+    }
+
+    function renderTrashView() {
+      if (trash.length === 0) {
+        reminderList.innerHTML = `<div class="empty-state">Recycle bin is empty.</div>`;
+        return;
+      }
+
+      trash.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'reminder-card';
+
+        card.innerHTML = `
+          <div class="reminder-main">
+            <div class="reminder-details">
+              <div class="reminder-title">${escapeHtml(item.title)}</div>
+              ${item.memo ? `<div class="reminder-memo">${escapeHtml(item.memo)}</div>` : ''}
+              <div class="reminder-meta">
+                <span class="meta-badge">Deleted: ${formatDisplayDate(item.deletedAt)}</span>
+              </div>
+            </div>
+          </div>
+          <button class="action-btn restore" data-restore="${item.id}" aria-label="Restore">↺</button>
+        `;
+        reminderList.appendChild(card);
+      });
+    }
+
+    /* Selection Mode Management */
+    function enterSelectionMode(initialId = null) {
+      isSelectionMode = true;
+      selectedTaskIds.clear();
+      if (initialId) {
+        selectedTaskIds.add(initialId);
+      }
+      document.body.classList.add('selection-mode');
+      standardNav.classList.add('hidden');
+      selectionNav.classList.add('active');
+      selectionBottomBar.classList.add('active');
+      openModalBtn.style.display = 'none';
+      updateSelectionUI();
+      renderContent();
+    }
+
+    function exitSelectionMode() {
+      isSelectionMode = false;
+      selectedTaskIds.clear();
+      document.body.classList.remove('selection-mode');
+      standardNav.classList.remove('hidden');
+      selectionNav.classList.remove('active');
+      selectionBottomBar.classList.remove('active');
+      openModalBtn.style.display = (settings.currentView === 'Reminders') ? 'flex' : 'none';
+      renderContent();
+    }
+
+    function toggleTaskSelection(id) {
+      if (selectedTaskIds.has(id)) {
+        selectedTaskIds.delete(id);
+      } else {
+        selectedTaskIds.add(id);
+      }
+      updateSelectionUI();
+      renderContent();
+    }
+
+    function updateSelectionUI() {
+      const count = selectedTaskIds.size;
+      selectionCount.textContent = `${count} selected`;
+      bulkDeleteBtn.disabled = count === 0;
+      bulkEditBtn.disabled = count !== 1;
+    }
+
+    /* Task Completion & Reoccurrence Increment Handler */
+    function toggleReminder(id) {
+      const target = reminders.find(r => r.id === id);
+      if (!target) return;
+
+      const isMarkingComplete = !target.completed;
+      const hasRecurrence = target.repeat && target.repeat !== "Don't repeat";
+
+      if (isMarkingComplete) {
+        // Move current cycle into completed list
+        target.completed = true;
+        target.completedAt = new Date().toISOString();
+
+        // If recurring, calculate next date cycle and spawn into active list
+        if (hasRecurrence) {
+          const nextDue = calculateNextRepeatDate(target.due, target.repeat);
+          if (nextDue) {
+            const nextCycleTask = {
+              ...target,
+              id: Date.now().toString(),
+              due: nextDue,
+              completed: false,
+              completedAt: null,
+              createdAt: new Date().toISOString()
+            };
+            reminders.unshift(nextCycleTask);
+          }
+        }
+      } else {
+        target.completed = false;
+        target.completedAt = null;
+      }
+
+      persistAllData();
+      renderContent();
+    }
+
+    function moveToRecycleBin(ids) {
+      const targetIds = Array.isArray(ids) ? ids : [ids];
+      const movedItems = [];
+
+      reminders = reminders.filter(item => {
+        if (targetIds.includes(item.id)) {
+          item.deletedAt = new Date().toISOString();
+          movedItems.push(item);
+          return false;
+        }
+        return true;
+      });
+
+      trash = [...movedItems, ...trash];
+      persistAllData();
+      renderContent();
+    }
+
+    function restoreFromTrash(id) {
+      const index = trash.findIndex(t => t.id === id);
+      if (index > -1) {
+        const item = trash.splice(index, 1)[0];
+        delete item.deletedAt;
+        reminders.unshift(item);
+        persistAllData();
+        renderContent();
+      }
+    }
+
+    function emptyRecycleBin() {
+      trash = [];
+      persistAllData();
+      renderContent();
+    }
+
+    /* Modal Form Setup */
+    function openModalForCreate() {
+      currentEditingTaskId = null;
+      modalTitle.textContent = 'New Reminder';
+      modalDeleteBtn.style.display = 'none';
+
+      titleInput.value = '';
+      memoInput.value = '';
+      dueInput.value = '';
+      importantToggle.checked = false;
+      repeatSelect.value = "Don't repeat";
+      alarmSelect.value = 'Medium';
+
+      modalOverlay.classList.add('active');
+      titleInput.focus();
+    }
+
+    function openModalForEdit(id) {
+      const item = reminders.find(r => r.id === id);
+      if (!item) return;
+
+      currentEditingTaskId = id;
+      modalTitle.textContent = 'Edit Reminder';
+      modalDeleteBtn.style.display = 'block';
+
+      titleInput.value = item.title || '';
+      memoInput.value = item.memo || '';
+      dueInput.value = item.due || '';
+      importantToggle.checked = Boolean(item.important);
+      repeatSelect.value = item.repeat || "Don't repeat";
+      alarmSelect.value = item.alarmVolume || 'Medium';
+
+      modalOverlay.classList.add('active');
+      titleInput.focus();
+    }
+
+    function closeModal() {
+      modalOverlay.classList.remove('active');
+      currentEditingTaskId = null;
+    }
+
+    function exportBackup() {
+      const backupData = {
+        exportedAt: new Date().toISOString(),
+        reminders,
+        trash,
+        settings
+      };
+      const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `samsung-reminders-${new Date().toISOString().slice(0, 10)}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function setupEventListeners() {
+      openDrawerBtn.addEventListener('click', () => {
+        updateSidebarCounts();
+        drawerOverlay.classList.add('active');
+      });
+
+      drawerOverlay.addEventListener('click', (e) => {
+        if (e.target === drawerOverlay) drawerOverlay.classList.remove('active');
+      });
+
+      openSettingsBtn.addEventListener('click', () => {
+        drawerOverlay.classList.remove('active');
+        settingsModalOverlay.classList.add('active');
+      });
+
+      closeSettingsBtn.addEventListener('click', () => {
+        settingsModalOverlay.classList.remove('active');
+      });
+
+      settingsModalOverlay.addEventListener('click', (e) => {
+        if (e.target === settingsModalOverlay) {
+          settingsModalOverlay.classList.remove('active');
+        }
+      });
+
+      darkThemeToggle.addEventListener('change', () => {
+        settings.darkMode = darkThemeToggle.checked;
+        document.body.classList.toggle('dark-mode', settings.darkMode);
+        persistAllData();
+      });
+
+      autoCollapseToggle.addEventListener('change', () => {
+        settings.autoCollapseCompleted = autoCollapseToggle.checked;
+        persistAllData();
+        renderContent();
+      });
+
+      exportDataRow.addEventListener('click', exportBackup);
+
+      clearAllRow.addEventListener('click', () => {
+        if (confirm('Clear all tasks and reset local storage?')) {
+          reminders = [];
+          trash = [];
+          persistAllData();
+          renderContent();
+          settingsModalOverlay.classList.remove('active');
+        }
+      });
+
+      drawer.querySelectorAll('.drawer-item').forEach(item => {
+        item.addEventListener('click', () => {
+          if (item.dataset.filter) {
+            applyFilterView(item.dataset.filter);
+          } else if (item.dataset.view) {
+            switchView(item.dataset.view);
+          }
+          drawerOverlay.classList.remove('active');
+        });
+      });
+
+      emptyTrashBtn.addEventListener('click', () => {
+        if (emptyTrashBtn.disabled) return;
+        emptyRecycleBin();
+        drawerOverlay.classList.remove('active');
+      });
+
+      startSelectionBtn.addEventListener('click', () => enterSelectionMode());
+      cancelSelectionBtn.addEventListener('click', () => exitSelectionMode());
+
+      selectAllBtn.addEventListener('click', () => {
+        const visibleCards = reminderList.querySelectorAll('.reminder-card');
+        if (selectedTaskIds.size === visibleCards.length) {
+          selectedTaskIds.clear();
+        } else {
+          visibleCards.forEach(card => selectedTaskIds.add(card.dataset.id));
+        }
+        updateSelectionUI();
+        renderContent();
+      });
+
+      bulkDeleteBtn.addEventListener('click', () => {
+        moveToRecycleBin(Array.from(selectedTaskIds));
+        exitSelectionMode();
+      });
+
+      bulkEditBtn.addEventListener('click', () => {
+        if (selectedTaskIds.size === 1) {
+          const selectedId = Array.from(selectedTaskIds)[0];
+          exitSelectionMode();
+          openModalForEdit(selectedId);
+        }
+      });
+
+      reminderList.addEventListener('click', (e) => {
+        const sectionHeader = e.target.closest('.section-header');
+        const card = e.target.closest('.reminder-card');
+        const checkbox = e.target.closest('.checkbox');
+        const trashBtn = e.target.closest('button[data-action="trash"]');
+        const restoreBtn = e.target.closest('button[data-restore]');
+
+        if (sectionHeader) {
+          const group = sectionHeader.closest('.section-group');
+          const statusKey = group.dataset.status;
+          const isCollapsed = group.classList.toggle('collapsed');
+          settings.collapsedSections[statusKey] = isCollapsed;
+          persistAllData();
+          return;
+        }
+
+        if (restoreBtn) {
+          restoreFromTrash(restoreBtn.dataset.restore);
+          return;
+        }
+
+        if (!card) return;
+        const taskId = card.dataset.id;
+
+        if (isSelectionMode) {
+          toggleTaskSelection(taskId);
+          return;
+        }
+
+        if (trashBtn) {
+          moveToRecycleBin(taskId);
+          return;
+        }
+
+        if (checkbox) {
+          toggleReminder(taskId);
+          return;
+        }
+
+        openModalForEdit(taskId);
+      });
+
+      openModalBtn.addEventListener('click', openModalForCreate);
+      closeModalBtn.addEventListener('click', closeModal);
+
+      modalOverlay.addEventListener('click', (e) => {
+        if (e.target === modalOverlay) closeModal();
+      });
+
+      modalDeleteBtn.addEventListener('click', () => {
+        if (currentEditingTaskId) {
+          moveToRecycleBin(currentEditingTaskId);
+          closeModal();
+        }
+      });
+
+      saveReminderBtn.addEventListener('click', () => {
+        const title = titleInput.value.trim();
+        if (!title) return;
+
+        if (currentEditingTaskId) {
+          const target = reminders.find(r => r.id === currentEditingTaskId);
+          if (target) {
+            target.title = title;
+            target.memo = memoInput.value.trim() || null;
+            target.important = importantToggle.checked;
+            target.due = dueInput.value || null;
+            target.repeat = repeatSelect.value;
+            target.alarmVolume = alarmSelect.value;
+          }
+        } else {
+          const newReminder = {
+            id: Date.now().toString(),
+            title,
+            memo: memoInput.value.trim() || null,
+            important: importantToggle.checked,
+            due: dueInput.value || null,
+            repeat: repeatSelect.value,
+            alarmVolume: alarmSelect.value,
+            completed: false,
+            createdAt: new Date().toISOString()
+          };
+          reminders.unshift(newReminder);
+        }
+
+        persistAllData();
+        renderContent();
+        closeModal();
+      });
+    }
+
+    init();
+  </script>
+</body>
+</html>
