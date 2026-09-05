@@ -745,100 +745,88 @@
       min-height: 64px;
     }
 
-    /* Separate Custom Days Section */
-    .custom-days-section {
+    /* Preset Chips for Time */
+    .quick-chips-row {
       display: flex;
-      flex-direction: column;
-      gap: 10px;
-      background: var(--bg-color);
-      padding: 14px;
-      border-radius: 16px;
-      border: 1px solid var(--border-color);
+      flex-wrap: wrap;
+      gap: 6px;
       margin-top: 2px;
     }
 
-    .custom-days-header-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .custom-days-header-label {
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: var(--text-main);
-      letter-spacing: 0.3px;
-    }
-
-    .custom-days-toggle-btn {
-      background: var(--card-bg);
+    .quick-chip {
+      background: var(--bg-color);
       border: 1px solid var(--border-color);
-      color: var(--text-main);
-      padding: 6px 14px;
-      border-radius: 10px;
-      font-size: 0.8rem;
+      border-radius: 20px;
+      padding: 6px 12px;
+      font-size: 0.78rem;
       font-weight: 600;
+      color: var(--text-main);
       cursor: pointer;
-      transition: all 0.2s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
+      transition: all 0.15s ease;
     }
 
-    .custom-days-toggle-btn.active {
-      background: var(--primary);
-      color: #ffffff;
+    .quick-chip:hover {
+      background: var(--primary-tint);
+      color: var(--primary);
       border-color: var(--primary);
-      box-shadow: 0 2px 6px rgba(45, 96, 255, 0.25);
     }
 
-    .custom-days-picker {
+    /* Sub-panels for Repeat Logic */
+    .repeat-subpanel {
       display: none;
       flex-direction: column;
       gap: 10px;
-      padding-top: 4px;
-    }
-
-    .custom-days-picker.visible {
-      display: flex;
-    }
-
-    .custom-days-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 6px;
-    }
-
-    .preset-btn {
-      background: var(--card-bg);
+      background: var(--bg-color);
+      padding: 12px 14px;
+      border-radius: 14px;
       border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 4px 8px;
-      font-size: 0.72rem;
-      font-weight: 600;
-      color: var(--primary);
-      cursor: pointer;
-      transition: background 0.15s;
+      margin-top: -4px;
     }
 
-    .preset-btn:hover {
-      background: var(--item-hover);
-    }
-
-    .day-chips-row {
+    .repeat-subpanel.visible {
       display: flex;
-      justify-content: space-between;
-      gap: 6px;
     }
 
-    .day-chip {
-      flex: 1;
-      height: 42px;
-      border-radius: 12px;
+    .inline-interval-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.92rem;
+      font-weight: 600;
+    }
+
+    .inline-number-input {
+      width: 64px;
+      padding: 6px 10px;
+      border-radius: 8px;
       border: 1px solid var(--border-color);
       background: var(--card-bg);
       color: var(--text-main);
-      font-size: 0.82rem;
+      font-size: 0.95rem;
+      font-weight: 700;
+      text-align: center;
+      outline: none;
+    }
+
+    .inline-number-input:focus {
+      border-color: var(--primary);
+    }
+
+    /* Sunday to Saturday Chips */
+    .week-chips-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 4px;
+    }
+
+    .week-chip {
+      flex: 1;
+      height: 38px;
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
+      background: var(--card-bg);
+      color: var(--text-main);
+      font-size: 0.8rem;
       font-weight: 700;
       cursor: pointer;
       display: flex;
@@ -848,15 +836,31 @@
       user-select: none;
     }
 
-    .day-chip:hover {
+    .week-chip:hover {
       background: var(--item-hover);
     }
 
-    .day-chip.active {
+    .week-chip.active {
       background: var(--primary);
       color: #ffffff;
       border-color: var(--primary);
       box-shadow: 0 2px 6px rgba(45, 96, 255, 0.3);
+    }
+
+    /* Radio Choice Rows for Month / Year */
+    .radio-choice-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .radio-choice-row input[type="radio"] {
+      accent-color: var(--primary);
+      width: 16px;
+      height: 16px;
     }
 
     .toggle-row {
@@ -1004,7 +1008,7 @@
         <button class="icon-btn" id="openSettingsBtn" aria-label="Settings">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="3"></circle>
-            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
           </svg>
         </button>
       </div>
@@ -1134,9 +1138,16 @@
         </div>
       </div>
 
+      <!-- Time Input & Quick Selection Options -->
       <div class="input-group">
         <label for="reminderDue">Time</label>
         <input type="datetime-local" id="reminderDue" class="input-field">
+        <div class="quick-chips-row">
+          <button type="button" class="quick-chip" id="time1HrBtn">1 hour from now</button>
+          <button type="button" class="quick-chip" id="time07Btn">Today 07:00</button>
+          <button type="button" class="quick-chip" id="time15Btn">Today 15:00</button>
+          <button type="button" class="quick-chip" id="time22Btn">Today 22:00</button>
+        </div>
       </div>
 
       <div class="grid-options">
@@ -1164,30 +1175,72 @@
         </div>
       </div>
 
-      <!-- Separate Custom Days Section with dedicated Header and Button -->
-      <div class="custom-days-section">
-        <div class="custom-days-header-row">
-          <!--span class="custom-days-header-label">Custom Days</span !-->
-          <button type="button" class="custom-days-toggle-btn" id="customDaysToggleBtn">
-            <span>Custom days</span>
-          </button>
+      <!-- Contextual Subpanel: Every Minute / Hour / Day (Number Change) -->
+      <div class="repeat-subpanel" id="intervalSubpanel">
+        <div class="inline-interval-row">
+          <span>Every</span>
+          <input type="number" id="intervalNumberInput" class="inline-number-input" min="1" max="999" value="1">
+          <span id="intervalUnitText">minute</span>
         </div>
+      </div>
 
-        <div class="custom-days-picker" id="customDaysPicker">
-          <div class="custom-days-actions">
-            <button type="button" class="preset-btn" id="presetWeekdaysBtn">Weekdays</button>
-            <button type="button" class="preset-btn" id="presetWeekendsBtn">Weekends</button>
-            <button type="button" class="preset-btn" id="presetAllDaysBtn">All</button>
-          </div>
-          <div class="day-chips-row" id="dayChipsRow">
-            <button type="button" class="day-chip" data-day="1">Mon</button>
-            <button type="button" class="day-chip" data-day="2">Tue</button>
-            <button type="button" class="day-chip" data-day="3">Wed</button>
-            <button type="button" class="day-chip" data-day="4">Thu</button>
-            <button type="button" class="day-chip" data-day="5">Fri</button>
-            <button type="button" class="day-chip" data-day="6">Sat</button>
-            <button type="button" class="day-chip" data-day="0">Sun</button>
-          </div>
+      <!-- Contextual Subpanel: Every Week (Sunday to Saturday Initial Letters) -->
+      <div class="repeat-subpanel" id="weekSubpanel">
+        <span style="font-size: 0.78rem; font-weight: 700; color: var(--text-sub); text-transform: uppercase;">Select Repeat Days (Sun to Sat)</span>
+        <div class="week-chips-row" id="weekChipsRow">
+          <button type="button" class="week-chip" data-day="0">S</button>
+          <button type="button" class="week-chip" data-day="1">M</button>
+          <button type="button" class="week-chip" data-day="2">T</button>
+          <button type="button" class="week-chip" data-day="3">W</button>
+          <button type="button" class="week-chip" data-day="4">T</button>
+          <button type="button" class="week-chip" data-day="5">F</button>
+          <button type="button" class="week-chip" data-day="6">S</button>
+        </div>
+      </div>
+
+      <!-- Contextual Subpanel: Every Month -->
+      <div class="repeat-subpanel" id="monthSubpanel">
+        <label class="radio-choice-row">
+          <input type="radio" name="monthRepeatType" value="sameDay" checked>
+          <span id="monthSameDayLabel">Repeat on the same day</span>
+        </label>
+        <label class="radio-choice-row">
+          <input type="radio" name="monthRepeatType" value="otherDate">
+          <span>Repeat on other date with day:</span>
+        </label>
+        <div id="monthOtherDateRow" style="display: flex; gap: 8px; align-items: center; padding-left: 24px;">
+          <input type="number" id="monthDayNumberInput" class="inline-number-input" min="1" max="31" value="1" style="width: 70px;">
+          <span style="font-size: 0.85rem; font-weight: 600;">day of month</span>
+        </div>
+      </div>
+
+      <!-- Contextual Subpanel: Every Year -->
+      <div class="repeat-subpanel" id="yearSubpanel">
+        <label class="radio-choice-row">
+          <input type="radio" name="yearRepeatType" value="sameDay" checked>
+          <span id="yearSameDayLabel">Repeat on the same date</span>
+        </label>
+        <label class="radio-choice-row">
+          <input type="radio" name="yearRepeatType" value="otherDate">
+          <span>Repeat on other date with day:</span>
+        </label>
+        <div id="yearOtherDateRow" style="display: flex; gap: 8px; align-items: center; padding-left: 24px;">
+          <select id="yearMonthSelect" class="input-field" style="padding: 6px 10px; font-size: 0.85rem;">
+            <option value="0">January</option>
+            <option value="1">February</option>
+            <option value="2">March</option>
+            <option value="3">April</option>
+            <option value="4">May</option>
+            <option value="5">June</option>
+            <option value="6">July</option>
+            <option value="7">August</option>
+            <option value="8">September</option>
+            <option value="9">October</option>
+            <option value="10">November</option>
+            <option value="11">December</option>
+          </select>
+          <input type="number" id="yearDayNumberInput" class="inline-number-input" min="1" max="31" value="1" style="width: 70px;">
+          <span style="font-size: 0.85rem; font-weight: 600;">day</span>
         </div>
       </div>
 
@@ -1301,9 +1354,16 @@
     let selectedTaskIds = new Set();
     let currentEditingTaskId = null;
 
-    // Independent custom days state
-    let isCustomDaysActive = false;
-    let selectedCustomDays = [1, 2, 3, 4, 5]; // 1=Mon .. 0=Sun
+    // Advanced Repeat Configuration State
+    let currentRepeatConfig = {
+      interval: 1,
+      weekDays: [1, 2, 3, 4, 5], // S M T W T F S (0=Sun .. 6=Sat)
+      monthOption: 'sameDay',
+      monthDay: 1,
+      yearOption: 'sameDay',
+      yearMonth: 0,
+      yearDay: 1
+    };
 
     const reminderList = document.getElementById('reminderList');
     const modalOverlay = document.getElementById('modalOverlay');
@@ -1325,13 +1385,28 @@
     const openDrawerBtn = document.getElementById('openDrawerBtn');
     const emptyTrashBtn = document.getElementById('emptyTrashBtn');
 
-    // Separate Custom Days elements
-    const customDaysToggleBtn = document.getElementById('customDaysToggleBtn');
-    const customDaysPicker = document.getElementById('customDaysPicker');
-    const dayChipsRow = document.getElementById('dayChipsRow');
-    const presetWeekdaysBtn = document.getElementById('presetWeekdaysBtn');
-    const presetWeekendsBtn = document.getElementById('presetWeekendsBtn');
-    const presetAllDaysBtn = document.getElementById('presetAllDaysBtn');
+    // Time Presets
+    const time1HrBtn = document.getElementById('time1HrBtn');
+    const time07Btn = document.getElementById('time07Btn');
+    const time15Btn = document.getElementById('time15Btn');
+    const time22Btn = document.getElementById('time22Btn');
+
+    // Subpanels
+    const intervalSubpanel = document.getElementById('intervalSubpanel');
+    const intervalNumberInput = document.getElementById('intervalNumberInput');
+    const intervalUnitText = document.getElementById('intervalUnitText');
+
+    const weekSubpanel = document.getElementById('weekSubpanel');
+    const weekChipsRow = document.getElementById('weekChipsRow');
+
+    const monthSubpanel = document.getElementById('monthSubpanel');
+    const monthSameDayLabel = document.getElementById('monthSameDayLabel');
+    const monthDayNumberInput = document.getElementById('monthDayNumberInput');
+
+    const yearSubpanel = document.getElementById('yearSubpanel');
+    const yearSameDayLabel = document.getElementById('yearSameDayLabel');
+    const yearMonthSelect = document.getElementById('yearMonthSelect');
+    const yearDayNumberInput = document.getElementById('yearDayNumberInput');
 
     const openSettingsBtn = document.getElementById('openSettingsBtn');
     const settingsModalOverlay = document.getElementById('settingsModalOverlay');
@@ -1411,75 +1486,174 @@
       return `${year}-${month}-${day}T${hours}:${minutes}`;
     }
 
-    function getCustomDaysLabel(daysArray) {
-      if (!daysArray || daysArray.length === 0) return 'Custom days';
-      if (daysArray.length === 7) return 'Everyday';
-      const names = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-      const sorted = [...daysArray].sort((a, b) => {
-        const orderA = a === 0 ? 7 : a;
-        const orderB = b === 0 ? 7 : b;
-        return orderA - orderB;
-      });
-      return sorted.map(d => names[d]).join(', ');
+    // Set Date with designated time
+    function setSpecificTimeToday(hours, minutes) {
+      const now = new Date();
+      now.setHours(hours, minutes, 0, 0);
+      dueInput.value = formatLocalDatetime(now);
+      updateRepeatLabelsFromDate();
     }
 
-    // Incremental calculations per recurrence pattern
-    function calculateNextRepeatDate(baseDateStr, isCustom, customDays, standardRecurrence) {
+    function updateRepeatLabelsFromDate() {
+      const d = dueInput.value ? new Date(dueInput.value) : new Date();
+      const dayOfMonth = d.getDate();
+      const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+      const dayName = d.toLocaleDateString(undefined, { weekday: 'long' });
+
+      monthSameDayLabel.textContent = `Repeat on the same day (${dayName}, ${dayOfMonth})`;
+      yearSameDayLabel.textContent = `Repeat on the same date (${monthNames[d.getMonth()]} ${dayOfMonth})`;
+
+      monthDayNumberInput.value = dayOfMonth;
+      yearMonthSelect.value = d.getMonth();
+      yearDayNumberInput.value = dayOfMonth;
+    }
+
+    function renderWeekChips(activeDays) {
+      weekChipsRow.querySelectorAll('.week-chip').forEach(chip => {
+        const d = parseInt(chip.dataset.day, 10);
+        chip.classList.toggle('active', activeDays.includes(d));
+      });
+    }
+
+    function updateRepeatSubpanels() {
+      const val = repeatSelect.value;
+      intervalSubpanel.classList.remove('visible');
+      weekSubpanel.classList.remove('visible');
+      monthSubpanel.classList.remove('visible');
+      yearSubpanel.classList.remove('visible');
+
+      if (val === 'Every minute') {
+        intervalUnitText.textContent = 'minute(s)';
+        intervalNumberInput.value = currentRepeatConfig.interval || 1;
+        intervalSubpanel.classList.add('visible');
+      } else if (val === 'Every hour') {
+        intervalUnitText.textContent = 'hour(s)';
+        intervalNumberInput.value = currentRepeatConfig.interval || 1;
+        intervalSubpanel.classList.add('visible');
+      } else if (val === 'Everyday') {
+        intervalUnitText.textContent = 'day(s)';
+        intervalNumberInput.value = currentRepeatConfig.interval || 1;
+        intervalSubpanel.classList.add('visible');
+      } else if (val === 'Every week') {
+        renderWeekChips(currentRepeatConfig.weekDays || [1, 2, 3, 4, 5]);
+        weekSubpanel.classList.add('visible');
+      } else if (val === 'Every month') {
+        updateRepeatLabelsFromDate();
+        document.querySelector(`input[name="monthRepeatType"][value="${currentRepeatConfig.monthOption || 'sameDay'}"]`).checked = true;
+        monthSubpanel.classList.add('visible');
+      } else if (val === 'Every year') {
+        updateRepeatLabelsFromDate();
+        document.querySelector(`input[name="yearRepeatType"][value="${currentRepeatConfig.yearOption || 'sameDay'}"]`).checked = true;
+        yearSubpanel.classList.add('visible');
+      }
+    }
+
+    // Dynamic Recurrence Calculation
+    function calculateNextRepeatDate(baseDateStr, repeatType, config) {
       const base = baseDateStr ? new Date(baseDateStr) : new Date();
       const nextDate = new Date(base);
+      const interval = Math.max(1, parseInt(config?.interval, 10) || 1);
 
-      if (isCustom) {
-        const days = (customDays && customDays.length > 0) ? customDays : [1, 2, 3, 4, 5];
-        let found = false;
-        for (let i = 1; i <= 7; i++) {
-          nextDate.setDate(nextDate.getDate() + 1);
-          if (days.includes(nextDate.getDay())) {
-            found = true;
-            break;
-          }
-        }
-        if (!found) nextDate.setDate(nextDate.getDate() + 1);
-        return formatLocalDatetime(nextDate);
-      }
-
-      switch (standardRecurrence) {
+      switch (repeatType) {
         case 'Every minute':
-          nextDate.setMinutes(nextDate.getMinutes() + 1);
+          nextDate.setMinutes(nextDate.getMinutes() + interval);
           break;
+
         case 'Every hour':
-          nextDate.setHours(nextDate.getHours() + 1);
+          nextDate.setHours(nextDate.getHours() + interval);
           break;
+
         case 'Everyday':
-          nextDate.setDate(nextDate.getDate() + 1);
+          nextDate.setDate(nextDate.getDate() + interval);
           break;
-        case 'Every week':
-          nextDate.setDate(nextDate.getDate() + 7);
-          break;
-        case 'Every month': {
-          const currentDay = nextDate.getDate();
-          nextDate.setDate(1);
-          nextDate.setMonth(nextDate.getMonth() + 1);
-          const daysInNextMonth = new Date(nextDate.getFullYear(), nextDate.getMonth() + 1, 0).getDate();
-          nextDate.setDate(Math.min(currentDay, daysInNextMonth));
+
+        case 'Every week': {
+          const days = (config?.weekDays && config.weekDays.length > 0) ? config.weekDays : [1, 2, 3, 4, 5];
+          let found = false;
+          for (let i = 1; i <= 7; i++) {
+            nextDate.setDate(nextDate.getDate() + 1);
+            if (days.includes(nextDate.getDay())) {
+              found = true;
+              break;
+            }
+          }
+          if (!found) nextDate.setDate(nextDate.getDate() + 1);
           break;
         }
+
+        case 'Every month': {
+          if (config?.monthOption === 'otherDate') {
+            const targetDay = Math.min(31, Math.max(1, parseInt(config.monthDay, 10) || 1));
+            nextDate.setDate(1);
+            nextDate.setMonth(nextDate.getMonth() + 1);
+            const daysInMonth = new Date(nextDate.getFullYear(), nextDate.getMonth() + 1, 0).getDate();
+            nextDate.setDate(Math.min(targetDay, daysInMonth));
+          } else {
+            const currentDay = nextDate.getDate();
+            nextDate.setDate(1);
+            nextDate.setMonth(nextDate.getMonth() + 1);
+            const daysInMonth = new Date(nextDate.getFullYear(), nextDate.getMonth() + 1, 0).getDate();
+            nextDate.setDate(Math.min(currentDay, daysInMonth));
+          }
+          break;
+        }
+
         case 'Every year': {
-          const currentDay = nextDate.getDate();
-          const currentMonth = nextDate.getMonth();
-          nextDate.setFullYear(nextDate.getFullYear() + 1);
-          if (currentMonth === 1 && currentDay === 29) {
-            const isLeap = new Date(nextDate.getFullYear(), 1, 29).getMonth() === 1;
-            if (!isLeap) {
-              nextDate.setDate(28);
+          if (config?.yearOption === 'otherDate') {
+            const targetMonth = parseInt(config.yearMonth, 10) || 0;
+            const targetDay = parseInt(config.yearDay, 10) || 1;
+            nextDate.setFullYear(nextDate.getFullYear() + 1);
+            nextDate.setDate(1);
+            nextDate.setMonth(targetMonth);
+            const daysInMonth = new Date(nextDate.getFullYear(), targetMonth + 1, 0).getDate();
+            nextDate.setDate(Math.min(targetDay, daysInMonth));
+          } else {
+            const currentDay = nextDate.getDate();
+            const currentMonth = nextDate.getMonth();
+            nextDate.setFullYear(nextDate.getFullYear() + 1);
+            if (currentMonth === 1 && currentDay === 29) {
+              const isLeap = new Date(nextDate.getFullYear(), 1, 29).getMonth() === 1;
+              if (!isLeap) nextDate.setDate(28);
             }
           }
           break;
         }
+
         default:
           return null;
       }
 
       return formatLocalDatetime(nextDate);
+    }
+
+    function getRepeatDisplayBadge(item) {
+      if (!item.repeat || item.repeat === "Don't repeat") return '';
+      const cfg = item.repeatConfig || {};
+
+      if (item.repeat === 'Every minute') {
+        const n = cfg.interval || 1;
+        return `Every ${n} min`;
+      }
+      if (item.repeat === 'Every hour') {
+        const n = cfg.interval || 1;
+        return `Every ${n} hr`;
+      }
+      if (item.repeat === 'Everyday') {
+        const n = cfg.interval || 1;
+        return n === 1 ? 'Everyday' : `Every ${n} days`;
+      }
+      if (item.repeat === 'Every week') {
+        const names = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+        const days = cfg.weekDays || [1, 2, 3, 4, 5];
+        return `Every week (${days.map(d => names[d]).join(' ')})`;
+      }
+      if (item.repeat === 'Every month') {
+        return cfg.monthOption === 'otherDate' ? `Monthly (day ${cfg.monthDay})` : 'Monthly (same day)';
+      }
+      if (item.repeat === 'Every year') {
+        return cfg.yearOption === 'otherDate' ? `Yearly (custom date)` : 'Yearly (same date)';
+      }
+      return item.repeat;
     }
 
     function escapeHtml(text) {
@@ -1565,16 +1739,11 @@
       card.className = `reminder-card ${item.completed ? 'completed' : ''} ${isSelected ? 'selected' : ''}`;
       card.dataset.id = item.id;
 
-      let repeatLabel = '';
-      if (item.isCustomDays) {
-        repeatLabel = getCustomDaysLabel(item.customDays);
-      } else if (item.repeat && item.repeat !== "Don't repeat") {
-        repeatLabel = item.repeat;
-      }
+      const repeatBadgeText = getRepeatDisplayBadge(item);
 
       let metaHtml = '';
       if (item.due) metaHtml += `<span class="meta-badge highlight">${formatDisplayDate(item.due)}</span>`;
-      if (repeatLabel) metaHtml += `<span class="meta-badge">🔁 ${escapeHtml(repeatLabel)}</span>`;
+      if (repeatBadgeText) metaHtml += `<span class="meta-badge">🔁 ${escapeHtml(repeatBadgeText)}</span>`;
       if (item.alarmVolume) metaHtml += `<span class="meta-badge">🔔 ${escapeHtml(item.alarmVolume)}</span>`;
 
       card.innerHTML = `
@@ -1730,14 +1899,14 @@
       if (!target) return;
 
       const isMarkingComplete = !target.completed;
-      const hasRecurrence = target.isCustomDays || (target.repeat && target.repeat !== "Don't repeat");
+      const hasRecurrence = target.repeat && target.repeat !== "Don't repeat";
 
       if (isMarkingComplete) {
         target.completed = true;
         target.completedAt = new Date().toISOString();
 
         if (hasRecurrence) {
-          const nextDue = calculateNextRepeatDate(target.due, target.isCustomDays, target.customDays, target.repeat);
+          const nextDue = calculateNextRepeatDate(target.due, target.repeat, target.repeatConfig);
           if (nextDue) {
             const nextCycleTask = {
               ...target,
@@ -1794,26 +1963,6 @@
       renderContent();
     }
 
-    function renderDayChipsSelection(daysArray) {
-      dayChipsRow.querySelectorAll('.day-chip').forEach(chip => {
-        const dayVal = parseInt(chip.dataset.day, 10);
-        chip.classList.toggle('active', daysArray.includes(dayVal));
-      });
-    }
-
-    function setCustomDaysActiveState(isActive) {
-      isCustomDaysActive = isActive;
-      customDaysToggleBtn.classList.toggle('active', isActive);
-      customDaysPicker.classList.toggle('visible', isActive);
-
-      if (isActive) {
-        repeatSelect.value = "Don't repeat";
-        repeatSelect.disabled = true;
-      } else {
-        repeatSelect.disabled = false;
-      }
-    }
-
     function openModalForCreate() {
       currentEditingTaskId = null;
       modalTitle.textContent = 'New Reminder';
@@ -1826,10 +1975,17 @@
       repeatSelect.value = "Don't repeat";
       alarmSelect.value = 'Medium';
 
-      selectedCustomDays = [1, 2, 3, 4, 5];
-      renderDayChipsSelection(selectedCustomDays);
-      setCustomDaysActiveState(false);
+      currentRepeatConfig = {
+        interval: 1,
+        weekDays: [1, 2, 3, 4, 5],
+        monthOption: 'sameDay',
+        monthDay: new Date().getDate(),
+        yearOption: 'sameDay',
+        yearMonth: new Date().getMonth(),
+        yearDay: new Date().getDate()
+      };
 
+      updateRepeatSubpanels();
       modalOverlay.classList.add('active');
       titleInput.focus();
     }
@@ -1849,10 +2005,17 @@
       repeatSelect.value = item.repeat || "Don't repeat";
       alarmSelect.value = item.alarmVolume || 'Medium';
 
-      selectedCustomDays = (item.customDays && item.customDays.length > 0) ? [...item.customDays] : [1, 2, 3, 4, 5];
-      renderDayChipsSelection(selectedCustomDays);
-      setCustomDaysActiveState(Boolean(item.isCustomDays));
+      currentRepeatConfig = item.repeatConfig ? { ...item.repeatConfig } : {
+        interval: 1,
+        weekDays: [1, 2, 3, 4, 5],
+        monthOption: 'sameDay',
+        monthDay: item.due ? new Date(item.due).getDate() : new Date().getDate(),
+        yearOption: 'sameDay',
+        yearMonth: item.due ? new Date(item.due).getMonth() : new Date().getMonth(),
+        yearDay: item.due ? new Date(item.due).getDate() : new Date().getDate()
+      };
 
+      updateRepeatSubpanels();
       modalOverlay.classList.add('active');
       titleInput.focus();
     }
@@ -1975,42 +2138,66 @@
         }
       });
 
-      // Toggle separate Custom Days button
-      customDaysToggleBtn.addEventListener('click', () => {
-        setCustomDaysActiveState(!isCustomDaysActive);
+      // Quick Time Selection Chips Event Handlers
+      time1HrBtn.addEventListener('click', () => {
+        const d = new Date(Date.now() + 3600000);
+        dueInput.value = formatLocalDatetime(d);
+        updateRepeatLabelsFromDate();
       });
 
-      // Individual Day Chips Click (Mon=1, Tue=2, Wed=3, Thu=4, Fri=5, Sat=6, Sun=0)
-      dayChipsRow.addEventListener('click', (e) => {
-        const chip = e.target.closest('.day-chip');
-        if (!chip) return;
+      time07Btn.addEventListener('click', () => setSpecificTimeToday(7, 0));
+      time15Btn.addEventListener('click', () => setSpecificTimeToday(15, 0));
+      time22Btn.addEventListener('click', () => setSpecificTimeToday(22, 0));
 
+      dueInput.addEventListener('change', updateRepeatLabelsFromDate);
+
+      // Repeat Dropdown Switcher
+      repeatSelect.addEventListener('change', updateRepeatSubpanels);
+
+      // Number input for interval (minute, hour, day)
+      intervalNumberInput.addEventListener('input', (e) => {
+        currentRepeatConfig.interval = Math.max(1, parseInt(e.target.value, 10) || 1);
+      });
+
+      // Sunday to Saturday Initial Letter Chips Toggle (0=S, 1=M, 2=T, 3=W, 4=T, 5=F, 6=S)
+      weekChipsRow.addEventListener('click', (e) => {
+        const chip = e.target.closest('.week-chip');
+        if (!chip) return;
         const dayVal = parseInt(chip.dataset.day, 10);
-        if (selectedCustomDays.includes(dayVal)) {
-          if (selectedCustomDays.length > 1) {
-            selectedCustomDays = selectedCustomDays.filter(d => d !== dayVal);
+        if (!currentRepeatConfig.weekDays) currentRepeatConfig.weekDays = [];
+
+        if (currentRepeatConfig.weekDays.includes(dayVal)) {
+          if (currentRepeatConfig.weekDays.length > 1) {
+            currentRepeatConfig.weekDays = currentRepeatConfig.weekDays.filter(d => d !== dayVal);
             chip.classList.remove('active');
           }
         } else {
-          selectedCustomDays.push(dayVal);
+          currentRepeatConfig.weekDays.push(dayVal);
           chip.classList.add('active');
         }
       });
 
-      // Presets
-      presetWeekdaysBtn.addEventListener('click', () => {
-        selectedCustomDays = [1, 2, 3, 4, 5];
-        renderDayChipsSelection(selectedCustomDays);
+      // Month Options
+      document.querySelectorAll('input[name="monthRepeatType"]').forEach(radio => {
+        radio.addEventListener('change', (e) => {
+          currentRepeatConfig.monthOption = e.target.value;
+        });
+      });
+      monthDayNumberInput.addEventListener('input', (e) => {
+        currentRepeatConfig.monthDay = Math.min(31, Math.max(1, parseInt(e.target.value, 10) || 1));
       });
 
-      presetWeekendsBtn.addEventListener('click', () => {
-        selectedCustomDays = [6, 0];
-        renderDayChipsSelection(selectedCustomDays);
+      // Year Options
+      document.querySelectorAll('input[name="yearRepeatType"]').forEach(radio => {
+        radio.addEventListener('change', (e) => {
+          currentRepeatConfig.yearOption = e.target.value;
+        });
       });
-
-      presetAllDaysBtn.addEventListener('click', () => {
-        selectedCustomDays = [1, 2, 3, 4, 5, 6, 0];
-        renderDayChipsSelection(selectedCustomDays);
+      yearMonthSelect.addEventListener('change', (e) => {
+        currentRepeatConfig.yearMonth = parseInt(e.target.value, 10) || 0;
+      });
+      yearDayNumberInput.addEventListener('input', (e) => {
+        currentRepeatConfig.yearDay = Math.min(31, Math.max(1, parseInt(e.target.value, 10) || 1));
       });
 
       reminderList.addEventListener('click', (e) => {
@@ -2073,9 +2260,8 @@
         const title = titleInput.value.trim();
         if (!title) return;
 
-        const isCustom = Boolean(isCustomDaysActive);
-        const customDaysVal = isCustom ? [...selectedCustomDays] : null;
-        const repeatVal = isCustom ? "Don't repeat" : repeatSelect.value;
+        const repeatVal = repeatSelect.value;
+        const finalConfig = (repeatVal !== "Don't repeat") ? { ...currentRepeatConfig } : null;
 
         if (currentEditingTaskId) {
           const target = reminders.find(r => r.id === currentEditingTaskId);
@@ -2085,8 +2271,7 @@
             target.important = importantToggle.checked;
             target.due = dueInput.value || null;
             target.repeat = repeatVal;
-            target.isCustomDays = isCustom;
-            target.customDays = customDaysVal;
+            target.repeatConfig = finalConfig;
             target.alarmVolume = alarmSelect.value;
           }
         } else {
@@ -2097,8 +2282,7 @@
             important: importantToggle.checked,
             due: dueInput.value || null,
             repeat: repeatVal,
-            isCustomDays: isCustom,
-            customDays: customDaysVal,
+            repeatConfig: finalConfig,
             alarmVolume: alarmSelect.value,
             completed: false,
             createdAt: new Date().toISOString()
